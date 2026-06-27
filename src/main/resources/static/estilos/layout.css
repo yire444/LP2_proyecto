@@ -1,0 +1,95 @@
+@charset "UTF-8";
+
+/* Estilos base para el Layout del Profesor Arbulú */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #1e1e24 !important; /* Fondo oscuro estilo intranet */
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Header Superior Fijo */
+.header {
+    width: 100%;
+    height: 60px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+/* Botón de activación del menú (Hambuguesa) */
+.btn-menu label {
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.btn-menu label:hover {
+    transform: scale(1.1);
+}
+
+/* Contenedor del Menú Lateral (Sidebar) */
+.container-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Capa translúcida de fondo */
+    z-index: 1000;
+    transition: all 0.5s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* El cuerpo interno del menú */
+.cont-menu {
+    width: 100%;
+    max-width: 280px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: -100%; /* Oculto a la izquierda por defecto */
+    transition: all 0.5s ease;
+}
+
+/* Enlaces del Nav dentro del menú */
+.cont-menu nav a {
+    display: block;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 14px 25px;
+    font-size: 16px;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.cont-menu nav a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid #0d6efd; /* Borde azul de enfoque al pasar el mouse */
+    color: #0d6efd;
+}
+
+/* Ícono X para cerrar el menú */
+.cont-menu label {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* ⚙️ TRUCO MAGISTRAL DEL PROFE: Activación mediante Checkbox Oculto */
+#btn-menu:checked ~ .container-menu {
+    opacity: 1;
+    visibility: visible;
+}
+
+#btn-menu:checked ~ .container-menu .cont-menu {
+    left: 0; /* Desplaza el menú hacia adentro de la pantalla */
+}

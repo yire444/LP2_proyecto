@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layoutBase(~{:: #miPerfilContent})}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+	<div id="miPerfilContent" class="animate__animated animate__fadeIn pb-5">
+
+		<section class="text-center my-4">
+			<h2 class="fw-bold text-primary mb-2"><i class="fa-solid fa-user-gear me-2"></i>Mi Perfil</h2>
+			<p class="text-white-50 lead">Gestiona y revisa las credenciales de tu cuenta de lectura en LibroLink.</p>
+		</section>
+
+		<div class="row justify-content-center">
+			<div class="col-md-8 col-lg-6">
+				<div class="card bg-secondary border-0 p-4 rounded-4 shadow-sm text-white"
+					style="background: rgba(33, 37, 41, 0.85) !important; backdrop-filter: blur(10px);">
+					
+					<div class="text-center mb-4">
+						<div class="d-inline-block bg-primary bg-opacity-10 p-3 rounded-circle mb-2">
+							<i class="fa-solid fa-user-shield text-primary fs-1"></i>
+						</div>
+						<h4 class="fw-bold m-0" th:text="${usuario.nombre + ' ' + usuario.apellido}">Nombre Completo</h4>
+						<span class="badge bg-info mt-2 px-3 py-1 text-uppercase small" th:text="${usuario.rol}">USER</span>
+					</div>
+
+					<hr class="border-secondary mb-4">
+
+					<form class="row g-3">
+						
+						<div class="col-md-6">
+							<label class="form-label text-info small text-uppercase fw-bold">Documento de Identidad</label>
+							<div class="input-group">
+								<span class="input-group-text bg-dark border-secondary text-white-50"><i class="fa-solid fa-id-card"></i></span>
+								<input type="text" class="form-control bg-dark border-secondary text-white" 
+									th:value="${usuario.documentoIdentidad}" readonly>
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<label class="form-label text-info small text-uppercase fw-bold">Teléfono Celular</label>
+							<div class="input-group">
+								<span class="input-group-text bg-dark border-secondary text-white-50"><i class="fa-solid fa-phone"></i></span>
+								<input type="text" class="form-control bg-dark border-secondary text-white" 
+									th:value="${usuario.telefono}" readonly>
+							</div>
+						</div>
+
+						<div class="col-12">
+							<label class="form-label text-info small text-uppercase fw-bold">Nombres</label>
+							<input type="text" class="form-control bg-dark border-secondary text-white" 
+								th:value="${usuario.nombre}" readonly>
+						</div>
+
+						<div class="col-12">
+							<label class="form-label text-info small text-uppercase fw-bold">Apellidos</label>
+							<input type="text" class="form-control bg-dark border-secondary text-white" 
+								th:value="${usuario.apellido}" readonly>
+						</div>
+
+						<div class="col-12">
+							<label class="form-label text-info small text-uppercase fw-bold">Correo Electrónico</label>
+							<div class="input-group">
+								<span class="input-group-text bg-dark border-secondary text-white-50"><i class="fa-solid fa-envelope"></i></span>
+								<input type="email" class="form-control bg-dark border-secondary text-white" 
+									th:value="${usuario.correo}" readonly>
+							</div>
+						</div>
+
+						<div class="col-12">
+							<label class="form-label text-info small text-uppercase fw-bold">Fecha de Nacimiento</label>
+							<div class="input-group">
+								<span class="input-group-text bg-dark border-secondary text-white-50"><i class="fa-solid fa-calendar-days"></i></span>
+								<input type="text" class="form-control bg-dark border-secondary text-white" 
+									th:value="${usuario.fechaNacimiento}" readonly>
+							</div>
+						</div>
+
+					</form>
+
+					<div class="mt-4 text-center">
+						<a th:href="@{/}" class="btn btn-outline-primary btn-sm rounded-3 px-4 fw-bold">
+							<i class="fa-solid fa-arrow-left me-2"></i>Volver al Catálogo
+						</a>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

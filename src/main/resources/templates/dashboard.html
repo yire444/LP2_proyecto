@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout :: layoutBase(~{:: #dashboardContent})}">
+
+<body>
+
+    <div id="dashboardContent">
+        <div class="row justify-content-center">
+            <div class="col-md-11">
+                
+                <div class="card bg-secondary text-white border-0 shadow-lg p-5 mb-5 rounded-4 animate__animated animate__fadeIn">
+                    <div class="card-body">
+                        <h1 class="display-4 fw-bold">
+                            ¡Hola de nuevo, <span class="text-info" th:text="${session.fullName}">Usuario</span>!
+                        </h1>
+                        <p class="lead text-light text-opacity-75 mt-3 fs-4">
+                            Bienvenido a la plataforma centralizada de <strong>LibroLink</strong>. Desde este panel administrativo 
+                            puedes navegar de manera fluida utilizando el menú lateral deslizante de la izquierda.
+                        </p>
+                        <hr class="my-4 border-light border-opacity-25">
+                        
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div>
+                                <p class="mb-0 text-white-50 small text-uppercase fw-bold">Nivel de Acceso Actual</p>
+                                <span class="badge bg-dark text-warning px-3 py-2 fs-6 mt-1 shadow-sm">
+                                    <i class="fa-solid fa-user-shield me-2"></i><span th:text="${session.rol}">USER</span>
+                                </span>
+                            </div>
+                            
+                            <div>
+                                <a th:href="@{/}" class="btn btn-primary btn-lg fw-bold shadow-sm px-4 py-2">
+                                    <i class="fa-solid fa-book-open me-2"></i>Ir al Catálogo de Libros
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4" th:if="${session.rol == 'ADMIN'}">
+                    <div class="col-md-4">
+                        <div class="card bg-dark border border-secondary text-white p-3 h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fa-solid fa-boxes-stacked fa-2x text-warning mb-3"></i>
+                                <h5 class="card-title fw-bold">Inventario de Libros</h5>
+                                <p class="card-text text-white-50 small">Controla el stock global y gestiona el alta de nuevos títulos y portadas.</p>
+                                <a th:href="@{/libro/listado}" class="btn btn-outline-warning btn-sm mt-2 w-100">Administrar</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-dark border border-secondary text-white p-3 h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fa-solid fa-users fa-2x text-warning mb-3"></i>
+                                <h5 class="card-title fw-bold">Control de Usuarios</h5>
+                                <p class="card-text text-white-50 small">Filtra las cuentas registradas y gestiona los accesos y bloqueos del sistema.</p>
+                                <a th:href="@{/usuario/listado}" class="btn btn-outline-warning btn-sm mt-2 w-100">Administrar</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-dark border border-secondary text-white p-3 h-100 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fa-regular fa-file-lines fa-2x text-warning mb-3"></i>
+                                <h5 class="card-title fw-bold">Reportes de Ventas</h5>
+                                <p class="card-text text-white-50 small">Visualiza el historial completo de las órdenes de compra y descárgalas en PDF.</p>
+                                <a th:href="@{/pedido/listado}" class="btn btn-outline-warning btn-sm mt-2 w-100">Ver Historial</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

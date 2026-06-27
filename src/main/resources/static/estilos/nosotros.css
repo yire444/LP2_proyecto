@@ -1,0 +1,51 @@
+@charset "UTF-8";
+#nosotrosContent {
+    padding-bottom: 80px;
+}
+
+.nosotros-header {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('/img/banner.png') no-repeat center center;
+    background-size: cover;
+    padding: 80px 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    animation: fadeInDown 0.8s ease-in-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+.card-title {
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.fa-solid {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.card:hover .fa-solid {
+    transform: scale(1.15);
+    color: #0d6efd !important; 
+}

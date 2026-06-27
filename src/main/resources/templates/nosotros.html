@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layout :: layoutBase(~{:: #nosotrosContent})}">
+
+<head>
+    <link rel="stylesheet" th:href="@{/estilos/nosotros.css}">
+</head>
+
+<body>
+
+    <div id="nosotrosContent" class="animate__animated animate__fadeIn">
+        
+        <section class="nosotros-header text-center text-light rounded-4 overflow-hidden position-relative mb-5"
+                 style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/img/banner.png') no-repeat center center; background-size: cover; padding: 60px 20px;">
+            <div class="content py-3">
+                <h1 class="fw-bold display-5">Sobre Nosotros</h1>
+                <p class="lead text-white-50 mx-auto mt-2" style="max-width: 700px;">
+                    LibroLink es una iniciativa integrada orientada a descentralizar el conocimiento y fomentar activamente los hábitos de lectura a nivel nacional.
+                </p>
+            </div>
+        </section>
+
+        <section class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-md-10 text-center">
+                    <h2 class="fw-bold text-primary mb-4">Nuestra Misión</h2>
+                    <p class="text-white-50 fs-5 lh-base">
+                        En <strong>LibroLink</strong> asumimos la convicción de que la lectura es un derecho fundamental y una herramienta transformadora para el desarrollo cognitivo y social. 
+                        Nuestro norte es acercar las obras literarias a todos los sectores de la población, optimizando la gestión de inventarios para garantizar el acceso democrático a la cultura y el saber diario.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mt-5 g-4 text-center">
+                <div class="col-md-4">
+                    <div class="card h-100 bg-secondary border-0 p-4 rounded-4 shadow-sm text-white">
+                        <div class="card-body">
+                            <i class="fa-solid fa-book-open fa-3x text-info mb-3"></i>
+                            <h5 class="fw-bold text-info card-title">Acceso a Libros</h5>
+                            <p class="text-white-50 small card-text mt-2">Garantizamos un inventario controlado, diversificado y con stock activo para cubrir todas las ramas de la educación y el entretenimiento.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 bg-secondary border-0 p-4 rounded-4 shadow-sm text-white">
+                        <div class="card-body">
+                            <i class="fa-solid fa-users fa-3x text-info mb-3"></i>
+                            <h5 class="fw-bold text-info card-title">Comunidad Lectora</h5>
+                            <p class="text-white-50 small card-text mt-2">Establecemos un ecosistema virtual intuitivo donde los usuarios monitorean sus compras y exploran nuevos autores con total fluidez.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 bg-secondary border-0 p-4 rounded-4 shadow-sm text-white">
+                        <div class="card-body">
+                            <i class="fa-solid fa-lightbulb fa-3x text-info mb-3"></i>
+                            <h5 class="fw-bold text-info card-title">Educación y Cultura</h5>
+                            <p class="text-white-50 small card-text mt-2">Apoyamos la gestión académica mediante herramientas automatizadas que auxilian a los administradores en el control logístico.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+</body>
+</html>

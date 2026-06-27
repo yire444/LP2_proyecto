@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layoutBase(~{:: #usuariosAdminContent})}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+	<div id="usuariosAdminContent" class="animate__animated animate__fadeIn pb-5">
+
+		<section class="text-center my-4">
+			<h2 class="fw-bold text-warning mb-2"><i class="fa-solid fa-users me-2"></i>Gestión de Usuarios</h2>
+			<p class="text-white-50 lead">Monitorea, revisa y supervisa las cuentas de los clientes registrados en LibroLink.</p>
+		</section>
+
+		<div class="card bg-secondary border-0 p-4 rounded-4 shadow-sm text-white"
+			style="background: rgba(33, 37, 41, 0.85) !important; backdrop-filter: blur(10px);">
+			<div class="table-responsive">
+				<table id="tablaUsuariosAdmin" class="table table-dark table-hover align-middle m-0 border-secondary">
+					<thead>
+						<tr class="text-warning border-secondary small text-uppercase">
+							<th style="width: 8%;">ID</th>
+							<th>Doc. Identidad</th>
+							<th>Nombre Completo</th>
+							<th>Correo Electrónico</th>
+							<th>Teléfono</th>
+							<th>F. Nacimiento</th>
+							<th class="text-center">Estado</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="u : ${lstUsuarios}" class="border-secondary">
+							<td class="fw-bold text-white-50" th:text="'#' + ${u.idUsuario}">ID</td>
+							<td th:text="${u.documentoIdentidad}">00000000</td>
+							<td class="fw-bold text-white" th:text="${u.nombre + ' ' + u.apellido}">Nombre Completo</td>
+							<td th:text="${u.correo}">correo@gmail.com</td>
+							<td th:text="${u.telefono}">999999999</td>
+							<td th:text="${u.fechaNacimiento}">01/01/2000</td>
+							<td class="text-center">
+								<span th:text="${u.activo == 1 || u.activo == true} ? 'Activo' : 'Inactivo'"
+									th:classappend="${u.activo == 1 || u.activo == true} ? 'bg-success' : 'bg-danger'"
+									class="badge rounded-pill px-3 py-1">Estado</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<script th:inline="none">
+			$(document).ready(function () {
+				$('#tablaUsuariosAdmin').DataTable({
+					language: {
+						url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/es-ES.json'
+					},
+					searching: true, // El admin puede buscar por Nombre, Apellido, DNI o Correo
+					lengthChange: false,
+					pageLength: 10,  // Paginación de 10 en 10
+					ordering: false  // Desactiva las flechas de subida y bajada de las cabeceras
+				});
+			});
+		</script>
+
+	</div>
+</body>
+</html>

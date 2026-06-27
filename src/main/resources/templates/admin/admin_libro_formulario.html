@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layoutBase(~{:: #formularioLibroContent})}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+	<div id="formularioLibroContent" class="animate__animated animate__fadeIn pb-5">
+
+		<section class="text-center my-4">
+			<h2 class="fw-bold text-warning mb-2">
+				<i class="fa-solid fa-book-medical me-2"></i>
+				<span th:text="${libro.idLibro != null} ? 'Modificar Obra' : 'Registrar Obra'">Formulario</span>
+			</h2>
+			<p class="text-white-50 lead">Completa la ficha técnica para actualizar el inventario global de la biblioteca.</p>
+		</section>
+
+		<div class="row justify-content-center">
+			<div class="col-md-8 col-lg-7">
+				<div class="card bg-secondary border-0 p-4 rounded-4 shadow-sm text-white"
+					style="background: rgba(33, 37, 41, 0.85) !important; backdrop-filter: blur(10px);">
+					
+					<form th:action="@{/libro/guardar}" th:object="${libro}" method="POST" class="row g-3">
+						
+						<input type="hidden" th:field="*{idLibro}" />
+
+						<div class="col-12">
+							<label class="form-label text-warning small text-uppercase fw-bold">Título de la Obra</label>
+							<input type="text" th:field="*{titulo}" class="form-control bg-dark border-secondary text-white rounded-3" 
+								placeholder="Ej. Cien años de soledad" required>
+							<div class="text-danger small mt-1" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></div>
+						</div>
+
+						<div class="col-12">
+							<label class="form-label text-warning small text-uppercase fw-bold">Autor o Escritor</label>
+							<input type="text" th:field="*{autor}" class="form-control bg-dark border-secondary text-white rounded-3" 
+								placeholder="Ej. Gabriel García Márquez" required>
+							<div class="text-danger small mt-1" th:if="${#fields.hasErrors('autor')}" th:errors="*{autor}"></div>
+						</div>
+
+						<div class="col-12">
+							<label class="form-label text-warning small text-uppercase fw-bold">Categoría Literaria</label>
+							<select th:field="*{categoria.idCategoria}" class="form-select bg-dark border-secondary text-white rounded-3" required>
+								<option value="" disabled selected>-- Selecciona una Categoría --</option>
+								<option th:each="cat : ${categorias}" 
+										th:value="${cat.idCategoria}" 
+										th:text="${cat.nombre}"></option>
+							</select>
+						</div>
+
+						<div class="col-md-6">
+							<label class="form-label text-warning small text-uppercase fw-bold">Precio de Venta (S/)</label>
+							<div class="input-group">
+								<span class="input-group-text bg-dark border-secondary text-white-50">S/</span>
+								<input type="number" step="0.1" th:field="*{precio}" class="form-control bg-dark border-secondary text-white" 
+									placeholder="0.00" min="0" required>
+							</div>
+							<div class="text-danger small mt-1" th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}"></div>
+						</div>
+
+						<div class="col-md-6">
+							<label class="form-label text-warning small text-uppercase fw-bold">Stock en Inventario</label>
+							<input type="number" th:field="*{stock}" class="form-control bg-dark border-secondary text-white rounded-3" 
+								placeholder="Ej. 15" min="0" required>
+							<div class="text-danger small mt-1" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}"></div>
+						</div>
+
+						<hr class="border-secondary my-4">
+
+						<div class="col-12 d-flex justify-content-between align-items-center">
+							<a th:href="@{/libro/listado}" class="btn btn-outline-secondary btn-sm rounded-3 px-4">
+								<i class="fa-solid fa-arrow-left me-2"></i>Cancelar
+							</a>
+							<button type="submit" class="btn btn-warning btn-sm rounded-3 px-5 fw-bold text-dark">
+								<i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios
+							</button>
+						</div>
+
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

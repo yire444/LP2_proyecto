@@ -1,0 +1,44 @@
+.card-premium {
+    background: rgba(33, 37, 41, 0.85) !important;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+}
+.input-premium {
+    background-color: #1a1d20 !important;
+    border: 1px solid #343a40 !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    color: #fff !important;
+}
+.input-premium:focus {
+    box-shadow: 0 0 0 3px rgba(13, 202, 240, 0.25) !important;
+    border-color: #0dcaf0 !important;
+}
+.tarjeta-visa {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 12px rgba(13, 110, 253, 0.2) !important;
+}
+.tarjeta-master {
+    border-color: #ffc107 !important;
+    box-shadow: 0 0 12px rgba(255, 193, 7, 0.2) !important;
+}
+.tarjeta-diners {
+    border-color: #0dcaf0 !important;
+    box-shadow: 0 0 12px rgba(13, 202, 240, 0.2) !important;
+}
+.tarjeta-error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 12px rgba(220, 53, 69, 0.2) !important;
+}
+.btn-glow {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+.btn-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.4);
+}
+.letter-spacing-input {
+    letter-spacing: 2px;
+}

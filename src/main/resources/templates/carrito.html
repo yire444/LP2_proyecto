@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layoutBase(~{:: #carritoContent})}">
+
+<body>
+	<div id="carritoContent" class="animate__animated animate__fadeIn pb-5">
+
+		<section class="text-center my-4">
+			<h2 class="fw-bold text-primary mb-2"><i class="fa-solid fa-cart-shopping me-2"></i>Mi Carrito de Compras</h2>
+			<p class="text-white-50 lead">Gestiona las obras seleccionadas antes de proceder con la compra de tus lecturas.</p>
+		</section>
+
+		<form th:action="@{/carrito/procesar}" method="post" th:if="${not #lists.isEmpty(items)}">
+			<div class="row g-4">
+				<div class="col-lg-8">
+					<div class="card bg-secondary border-0 p-4 rounded-4 shadow-sm text-white">
+						<div class="table-responsive">
+							<table class="table table-dark table-hover align-middle m-0 border-secondary">
+								<thead>
+									<tr class="text-info border-secondary small text-uppercase">
+										<th>Portada</th>
+										<th>Libro</th>
+										<th class="text-center">Precio</th>
+										<th class="text-center" style="width: 150px;">Cantidad</th>
+										<th class="text-center">Subtotal</th>
+										<th class="text-center">Acción</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="item : ${items}" class="border-secondary">
+										<td>
+											<img th:src="@{/img/{img}(img=${item.imagen})}" class="rounded shadow-sm"
+												alt="Portada" style="height: 70px; width: 50px; object-fit: cover;">
+											<input type="hidden" name="idLibro" th:value="${item.idLibro}" />
+										</td>
+										<td>
+											<h6 class="mb-0 fw-bold text-white" th:text="${item.titulo}">Título</h6>
+											<small class="text-white-50" th:text="${item.autor}">Autor</small>
+										</td>
+										<td class="text-center">
+											S/ <span class="precio-base"
+												th:text="${#numbers.formatDecimal(item.precio, 1, 2)}">0.00</span>
+										</td>
+
+										<td class="text-center">
+											<div class="d-flex align-items-center justify-content-center gap-2">
+												<button type="button"
+													class="btn btn-sm btn-outline-secondary rounded-circle px-2 btn-menos"
+													th:data-id="${item.idLibro}"
+													th:data-precio="${item.precio}">−</button>
+
+												<span class="fw-bold cantidad-val"
+													th:text="${item.cantidad}"
+													th:data-id="${item.idLibro}">1</span>
+
+												<input type="hidden" name="cantidad"
+													th:value="${item.cantidad}"
+													th:data-id="${item.idLibro}"
+													class="hidden-cantidad" />
+
+												<button type="button"
+													class="btn btn-sm btn-outline-secondary rounded-circle px-2 btn-mas"
+													th:data-id="${item.idLibro}"
+													th:data-precio="${item.precio}">+</button>
+											</div>
+										</td>
+
+										<td class="text-center text-info fw-bold">
+											S/ <span class="subtotal-span"
+												th:text="${#numbers.formatDecimal(item.subtotal, 1, 2)}">0.00</span>
+										</td>
+
+										<td class="text-center">
+											<a th:href="@{/carrito/eliminar(idLibro=${item.idLibro})}"
+												class="btn btn-sm btn-outline-danger rounded-circle">
+												<i class="fa-solid fa-trash-can"></i>
+											</a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-4">
+					<div class="card bg-secondary border-0 p-4 rounded-4 shadow-sm text-white text-center">
+						<h5 class="fw-bold text-info mb-4">Resumen de la Orden</h5>
+						<div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-dark pb-2">
+							<span class="text-white-50">Productos:</span>
+							<strong th:text="${#lists.size(items)}">0</strong>
+						</div>
+						<div class="d-flex justify-content-between align-items-center mb-4">
+							<span class="fs-5 text-white">Total a Pagar:</span>
+							<h3 class="text-info fw-bold m-0" id="totalCarritoGlobal">
+								S/ <span th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span>
+							</h3>
+						</div>
+
+						<button type="submit" class="btn btn-primary w-100 btn-lg fw-bold shadow-sm mb-2">
+							<i class="fas fa-credit-card me-2"></i>Proceder al Pago
+						</button>
+
+						<a th:href="@{/}" class="btn btn-outline-light w-100 fw-bold">
+							<i class="fas fa-plus me-2"></i>Seguir Agregando
+						</a>
+					</div>
+				</div>
+			</div>
+		</form>
+
+		<div class="row justify-content-center" th:if="${#lists.isEmpty(items)}">
+			<div class="col-md-8 col-lg-6 text-center">
+				<div class="card bg-secondary border-0 p-5 rounded-4 shadow-sm text-white py-5">
+					<i class="fa-solid fa-basket-shopping fa-3x text-muted mb-3"></i>
+					<p class="text-muted fs-5 mb-0">Tu carrito está vacío actualmente.</p>
+					<div class="mt-3">
+						<a th:href="@{/}" class="btn btn-primary fw-bold px-4 py-2 shadow-sm rounded-3">
+							<i class="fas fa-arrow-left me-2"></i>Ir al Catálogo
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<script th:inline="javascript">
+		document.addEventListener("click", (e) => {
+			const esMas   = e.target.classList.contains("btn-mas");
+			const esMenos = e.target.classList.contains("btn-menos");
+			if (!esMas && !esMenos) return;
+
+			const idLibro      = e.target.getAttribute("data-id");
+			const precio       = parseFloat(e.target.getAttribute("data-precio")) || 0;
+			const spanCantidad = document.querySelector(`.cantidad-val[data-id="${idLibro}"]`);
+			const hiddenInput  = document.querySelector(`.hidden-cantidad[data-id="${idLibro}"]`);
+			const fila         = e.target.closest("tr");
+			const spanSubtotal = fila?.querySelector(".subtotal-span");
+
+			let cantidad = parseInt(spanCantidad.textContent) || 1;
+			if (esMas)   cantidad += 1;
+			if (esMenos) cantidad = Math.max(1, cantidad - 1);
+
+			spanCantidad.textContent = cantidad;
+			hiddenInput.value        = cantidad;
+			if (spanSubtotal) spanSubtotal.textContent = (precio * cantidad).toFixed(2);
+
+			let granTotal = 0;
+			document.querySelectorAll(".subtotal-span").forEach(s => {
+				granTotal += parseFloat(s.textContent) || 0;
+			});
+			const containerTotal = document.getElementById("totalCarritoGlobal");
+			if (containerTotal) containerTotal.innerHTML = "S/ " + granTotal.toFixed(2);
+
+			// Sincronizar con el servidor en segundo plano
+			const url = /*[[@{/carrito/actualizar-cantidad}]]*/ '/carrito/actualizar-cantidad';
+			fetch(`${url}?idLibro=${idLibro}&cantidad=${cantidad}`)
+				.then(r => { if (!r.ok) throw new Error('Status ' + r.status); return r.text(); })
+				.then(() => console.log(`✅ Libro ${idLibro} -> cantidad ${cantidad}`))
+				.catch(err => console.error("❌ Error sync:", err.message));
+		});
+	</script>
+</body>
+
+</html>

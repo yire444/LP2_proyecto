@@ -1,0 +1,43 @@
+@charset "UTF-8";
+
+/* =========================================================================
+   Estilos Exclusivos para el Catálogo Moderno de LibroLink
+   ========================================================================= */
+
+body {
+	background: url('/img/fondo1.png') no-repeat center center fixed;
+}
+
+/* Efecto Pro: Eleva la tarjeta y profundiza la sombra al pasar el mouse */
+.hover-card {
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Chips dinámicos para los filtros de búsqueda activos */
+.filter-tag {
+	display: inline-block;
+	background-color: #0d6efd;
+	color: white;
+	padding: 6px 12px;
+	border-radius: 20px;
+	margin-right: 8px;
+	font-size: 0.85rem;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.filter-tag .remove {
+	margin-left: 6px;
+	cursor: pointer;
+	font-weight: bold;
+	transition: color 0.2s ease;
+}
+
+.filter-tag .remove:hover {
+	color: #ffc107;
+	/* Se pone amarillo al pasar el mouse para borrar */
+}

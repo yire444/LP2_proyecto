@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layoutBase(~{:: #catalogoContent})}">
+
+<head>
+	<link rel="stylesheet" th:href="@{/estilos/index.css}">
+	<style>
+		.hover-card {
+			transition: transform 0.3s ease, box-shadow 0.3s ease;
+		}
+
+		.hover-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+		}
+
+		.filter-tag {
+			display: inline-block;
+			background-color: #0d6efd;
+			color: white;
+			padding: 6px 12px;
+			border-radius: 20px;
+			margin-right: 8px;
+			font-size: 0.85rem;
+		}
+
+		.filter-tag .remove {
+			margin-left: 6px;
+			cursor: pointer;
+			font-weight: bold;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="catalogoContent" class="animate__animated animate__fadeIn">
+
+		<section class="text-center my-4">
+			<h2 class="fw-bold text-primary mb-2"><i class="fa-solid fa-store me-2"></i>Catálogo de Libros</h2>
+			<p class="text-white-50 lead">Explora nuestra colección y encuentra tu próxima lectura favorita</p>
+		</section>
+
+		<section class="card bg-secondary border-0 p-4 mb-4 shadow-sm rounded-4">
+			<form id="filtrosForm" th:action="@{/}" method="get" class="row g-3 align-items-end">
+				<div class="col-md-3">
+					<label for="filtroAutor" class="form-label text-white-50 small fw-bold">Buscar Palabra</label>
+					<input type="text" id="filtroAutor" name="autor"
+						class="form-control bg-dark text-white border-secondary" placeholder="Título o autor..."
+						th:value="${param.autor}">
+				</div>
+
+				<div class="col-md-3">
+					<label for="filtroCategoria" class="form-label text-white-50 small fw-bold">Categoría</label>
+					<select id="filtroCategoria" name="idCategoria"
+						class="form-select bg-dark text-white border-secondary">
+						<option value="">Todas las categorías</option>
+						<option th:each="cat : ${categorias}" th:value="${cat.idCategoria}" th:text="${cat.nombre}"
+							th:selected="${param.idCategoria != null and param.idCategoria[0] == #strings.toString(cat.idCategoria)}">
+						</option>
+					</select>
+				</div>
+
+				<div class="col-md-3">
+					<label for="filtroOrden" class="form-label text-white-50 small fw-bold">Ordenar por Precio</label>
+					<select id="filtroOrden" name="ordenPrecio" class="form-select bg-dark text-white border-secondary">
+						<option value="">--SELECCIONAR--</option>
+						<option value="ASC"
+							th:selected="${param.ordenPrecio != null and param.ordenPrecio[0] == 'ASC'}">Menor a mayor
+						</option>
+						<option value="DESC"
+							th:selected="${param.ordenPrecio != null and param.ordenPrecio[0] == 'DESC'}">Mayor a menor
+						</option>
+					</select>
+				</div>
+
+				<div class="col-md-3">
+					<button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm">
+						<i class="fas fa-search me-2"></i>Aplicar Filtros
+					</button>
+				</div>
+			</form>
+
+			<div id="activeFilters" class="mt-3"></div>
+		</section>
+
+		<section class="mb-5">
+			<div class="row g-4" id="catalogoGrid">
+
+				<div class="col-md-3 libro-card" th:each="libro : ${lstLibros}">
+					<div
+						class="card h-100 bg-secondary border-0 shadow-sm hover-card text-white rounded-4 overflow-hidden">
+
+						<img th:src="@{/img/{img}(img=${libro.imagen})}" class="card-img-top" alt="Portada"
+							style="height: 280px; object-fit: cover;">
+
+						<div class="card-body d-flex flex-column text-center">
+							<h5 class="card-title fw-bold text-truncate mb-1" th:text="${libro.titulo}">Título</h5>
+							<p class="text-white-50 small mb-2" th:text="'Autor: ' + ${libro.autor}">Autor</p>
+							<h4 class="text-info fw-bold mb-3" th:text="'S/ ' + ${libro.precio}">S/ 0.00</h4>
+
+							<div class="mb-3">
+								<span th:if="${libro.stock > 0}" class="badge bg-success px-3 py-2"
+									th:text="'Disponibles: ' + ${libro.stock}"></span>
+								<span th:if="${libro.stock == 0}" class="badge bg-danger px-3 py-2">Agotado</span>
+							</div>
+
+							<div class="mt-auto">
+								<a th:href="@{/libro/detalle(idLibro=${libro.idLibro})}"
+									class="btn btn-outline-info w-100 fw-bold mb-2">
+									<i class="fas fa-eye me-2"></i>Ver más
+								</a>
+
+								<th:block th:if="${session.idUsuario != null}">
+									<a th:if="${libro.stock > 0}" th:href="@{/carrito/agregar(idLibro=${libro.idLibro})}"
+										class="btn btn-primary w-100 fw-bold">
+										<i class="fas fa-shopping-cart me-2"></i>Comprar
+									</a>
+								</th:block>
+								
+								<th:block th:if="${session.idUsuario == null}">
+									<button th:if="${libro.stock > 0}" type="button"
+										class="btn btn-primary w-100 fw-bold alert-login-btn">
+										<i class="fas fa-shopping-cart me-2"></i>Comprar
+									</button>
+								</th:block>
+								
+								<button th:if="${libro.stock == 0}" class="btn btn-dark w-100 text-muted" disabled>
+									<i class="fas fa-ban me-2"></i>Sin Unidades
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<nav th:if="${not #lists.isEmpty(lstLibros)}">
+				<ul id="pagination" class="pagination justify-content-center mt-5"></ul>
+			</nav>
+
+			<div th:if="${#lists.isEmpty(lstLibros)}" class="text-center py-5">
+				<i class="fa-regular fa-folder-open fa-3x text-muted mb-3"></i>
+				<p class="text-muted fs-5">No se encontraron títulos que coincidan con la búsqueda.</p>
+			</div>
+		</section>
+
+	</div>
+
+	<script th:inline="javascript">
+		document.addEventListener("DOMContentLoaded", () => {
+
+			// 🌟 CORREGIDO: SweetAlert optimizado con JavaScript Puro (Vanilla JS)
+			document.querySelectorAll(".alert-login-btn").forEach(button => {
+				button.addEventListener("click", (e) => {
+					e.preventDefault();
+					Swal.fire({
+						title: "Autenticación Requerida",
+						text: "Para añadir libros a tu carrito de compras debes contar con una sesión institucional activa.",
+						icon: "info",
+						showCancelButton: true,
+						confirmButtonColor: "#0d6efd",
+						cancelButtonColor: "#6c757d",
+						confirmButtonText: "<i class='fas fa-sign-in-alt me-2'></i>Iniciar Sesión",
+						cancelButtonText: "Seguir Navegando"
+					}).then((result) => {
+						if (result.isConfirmed) {
+							window.location.href = "/login/iniciar-sesion";
+						}
+					});
+				});
+			});
+
+			const items = document.querySelectorAll(".libro-card");
+			const itemsPerPage = 8;
+			const pagination = document.getElementById("pagination");
+			let currentPage = 1;
+
+			if (items.length > 0 && pagination) {
+				function showPage(page) {
+					const start = (page - 1) * itemsPerPage;
+					const end = start + itemsPerPage;
+					items.forEach((item, i) => {
+						item.style.display = (i >= start && i < end) ? "block" : "none";
+					});
+				}
+
+				function setupPagination() {
+					const pageCount = Math.ceil(items.length / itemsPerPage);
+					pagination.innerHTML = "";
+					for (let i = 1; i <= pageCount; i++) {
+						const li = document.createElement("li");
+						li.className = "page-item" + (i === currentPage ? " active" : "");
+						li.innerHTML = `<a class="page-link bg-dark text-white border-secondary" href="#">${i}</a>`;
+						li.addEventListener("click", e => {
+							e.preventDefault();
+							currentPage = i;
+							showPage(currentPage);
+							setupPagination();
+						});
+						pagination.appendChild(li);
+					}
+				}
+				showPage(currentPage);
+				setupPagination();
+			}
+
+			const autor = document.getElementById("filtroAutor").value;
+			const categoria = document.getElementById("filtroCategoria");
+			const orden = document.getElementById("filtroOrden");
+			const activeFilters = document.getElementById("activeFilters");
+
+			if (autor && activeFilters) addFilterTag("Búsqueda: " + autor, "autor");
+			if (categoria && categoria.value && activeFilters) addFilterTag("Categoría: " + categoria.options[categoria.selectedIndex].text, "idCategoria");
+
+
+			if (orden && orden.value && activeFilters) {
+				addFilterTag("Orden: " + orden.options[orden.selectedIndex].text, "ordenPrecio");
+			}
+
+			function addFilterTag(text, field) {
+				const tag = document.createElement("div");
+				tag.className = "filter-tag bg-primary shadow-sm mb-2";
+				tag.innerHTML = text + ' <span class="remove text-white ms-2" style="cursor:pointer;">&times;</span>';
+				tag.querySelector(".remove").onclick = () => {
+					document.querySelector(`[name=${field}]`).value = "";
+					document.getElementById("filtrosForm").submit();
+				};
+				activeFilters.appendChild(tag);
+			}
+		});
+	</script>
+</body>
+
+</html>

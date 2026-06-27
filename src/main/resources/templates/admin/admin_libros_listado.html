@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layoutBase(~{:: #librosAdminContent})}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+	<div id="librosAdminContent" class="animate__animated animate__fadeIn pb-5">
+
+		<section class="d-flex justify-content-between align-items-center my-4">
+			<div>
+				<h2 class="fw-bold text-warning mb-1"><i class="fa-solid fa-boxes-stacked me-2"></i>Gestión de Libros</h2>
+				<p class="text-white-50 m-0">Administra, edita y expande el catálogo de obras disponibles en la plataforma.</p>
+			</div>
+			<a th:href="@{/libro/nuevo}" class="btn btn-primary rounded-3 fw-bold shadow-sm">
+				<i class="fa-solid fa-plus me-2"></i>Registrar Obra
+			</a>
+		</section>
+
+		<div class="card bg-secondary border-0 p-4 rounded-4 shadow-sm text-white"
+			style="background: rgba(33, 37, 41, 0.85) !important; backdrop-filter: blur(10px);">
+			<div class="table-responsive">
+				<table id="tablaLibrosAdmin" class="table table-dark table-hover align-middle m-0 border-secondary">
+					<thead>
+						<tr class="text-warning border-secondary small text-uppercase">
+							<th style="width: 8%;">ID</th>
+							<th>Título de la Obra</th>
+							<th>Autor</th>
+							<th>Categoría</th>
+							<th class="text-center">Precio</th>
+							<th class="text-center">Stock</th>
+							<th class="text-center" style="width: 12%;">Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="l : ${lstLibrosAdmin}" class="border-secondary">
+							<td class="fw-bold text-white-50" th:text="'#' + ${l.idLibro}">#1</td>
+							<td class="fw-bold text-white" th:text="${l.titulo}">Título</td>
+							<td th:text="${l.autor}">Autor</td>
+							<td>
+								<span class="badge bg-dark border border-secondary text-info px-2 py-1" 
+									th:text="${l.categoria.nombre}">Categoría</span>
+							</td>
+							<td class="text-center fw-bold text-success" th:text="'S/ ' + ${l.precio}">S/ 0.00</td>
+							<td class="text-center fw-bold" 
+								th:classappend="${l.stock > 5} ? 'text-white' : 'text-danger'" 
+								th:text="${l.stock}">0</td>
+							<td class="text-center">
+								<a th:href="@{/libro/editar(idLibro=${l.idLibro})}" 
+								   class="btn btn-sm btn-outline-warning rounded-3 px-3">
+									<i class="fa-solid fa-pen-to-square me-1"></i> Editar
+								</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<script th:inline="none">
+			$(document).ready(function () {
+				$('#tablaLibrosAdmin').DataTable({
+					language: {
+						url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/es-ES.json'
+					},
+					searching: true, // Permitimos buscar obras rápidamente
+					lengthChange: false,
+					pageLength: 10,   // Paginación de 10 en 10
+					ordering: false   // Sin flechas molestas de subida o bajada
+				});
+			});
+		</script>
+
+	</div>
+</body>
+</html>

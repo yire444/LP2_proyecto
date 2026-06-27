@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layoutBase(~{:: #misComprasContent})}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+	<div id="misComprasContent" class="animate__animated animate__fadeIn pb-5">
+
+		<section class="text-center my-4">
+			<h2 class="fw-bold text-primary mb-2"><i class="fa-solid fa-bag-shopping me-2"></i>Mis Compras</h2>
+			<p class="text-white-50 lead">Revisa el historial detallado de tus órdenes y el estado de tus lecturas adquiridas.</p>
+		</section>
+
+		<div class="card bg-secondary border-0 p-4 rounded-4 shadow-sm text-white"
+			style="background: rgba(33, 37, 41, 0.85) !important; backdrop-filter: blur(10px);">
+			<div class="table-responsive">
+				<table id="tablaMisCompras" class="table table-dark table-hover align-middle m-0 border-secondary" data-order='[[0, "desc"]]'>
+					<thead>
+						<tr class="text-info border-secondary small text-uppercase">
+							<th>N° Pedido</th>
+							<th>Fecha de Compra</th>
+							<th class="text-center">Total Pagado</th>
+							<th class="text-center">Estado</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="p : ${pedidos}" class="border-secondary">
+							
+							<td class="fw-bold text-white" th:text="'#' + ${p.idPedido}">#000000</td>
+							<td th:text="${p.fechaCompra}">01/01/2026</td>
+							<td class="text-center fw-bold text-success" th:text="'S/ ' + ${p.total}">S/ 0.00</td>
+							
+							<td class="text-center">
+								<span th:text="${p.estado}"
+									th:classappend="${p.estado == 'PAGADO' || p.estado == 'Entregado'} ? 'bg-success' : 'bg-danger'"
+									class="badge rounded-pill px-3 py-1">Estado</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<script th:inline="none">
+					$(document).ready(function () {
+						$('#tablaMisCompras').DataTable({
+							language: {
+								url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/es-ES.json'
+							},
+							searching: false,
+							lengthChange: false,
+							pageLength: 10,   
+							ordering: false   
+						});
+					});
+				</script>
+
+	</div>
+</body>
+</html>

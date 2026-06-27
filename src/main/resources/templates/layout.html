@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layoutBase(contenido)">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>LibroLink - Sistema de Gestión</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<link class="layout-datatables" rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.css">
+	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+	<script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
+
+	<link rel="stylesheet" th:href="@{/estilos/layout.css}">
+</head>
+
+<body class="bg-dark text-white d-flex flex-column min-vh-100">
+
+	<header class="header bg-gradient bg-secondary shadow-sm">
+		<div class="container-fluid d-flex justify-content-between align-items-center py-2 px-4">
+			<div class="btn-menu">
+				<label for="btn-menu" style="cursor: pointer;"><i class="fa-solid fa-bars text-white fs-4"></i></label>
+			</div>
+			<div class="text-white">
+				<h1 class="h5 m-0 fw-bold">
+					<i class="fa-solid fa-book-open text-primary me-2"></i>LibroLink -
+					<span
+						th:text="${session.idUsuario != null ? 'Bienvenido, ' + session.fullName : 'Portal de Lectura'}">Usuario</span>
+					<span th:if="${session.idUsuario != null}" class="badge bg-info ms-2 fs-7"
+						th:text="${session.rol == 'ADMIN' ? 'Administrador' : 'Cliente'}">Rol</span>
+				</h1>
+			</div>
+		</div>
+	</header>
+
+	<input type="checkbox" id="btn-menu" style="display: none;">
+
+	<div class="container-menu">
+		<div class="cont-menu bg-dark text-white border-end border-secondary">
+			<nav class="d-flex flex-column pt-4">
+				<div class="px-4 mb-4 text-center">
+					<h3 class="h5 fw-bold text-primary">Navegación</h3>
+					<hr class="border-secondary">
+				</div>
+
+				<a th:href="@{/dashboard}"><i class="fa-solid fa-house me-2"></i> Inicio</a>
+				<a th:href="@{/}"><i class="fa-solid fa-book-bookmark me-2"></i> Catálogo General</a>
+				<a th:href="@{/nosotros}"><i class="fa-solid fa-circle-info me-2"></i> Nosotros</a>
+				<a th:href="@{/contacto}"><i class="fa-solid fa-envelope me-2"></i> Contacto</a>
+
+				<th:block th:if="${session.rol == 'USER'}">
+					<hr class="border-secondary mx-3">
+					<span class="px-4 text-muted small text-uppercase fw-bold">Mi Espacio</span>
+					<a th:href="@{/carrito}"><i class="fa-solid fa-cart-shopping me-2 text-info"></i> Mi Carrito</a>
+					<a th:href="@{/pedido/mis-compras}"><i class="fa-solid fa-bag-shopping me-2 text-info"></i> Mis Compras</a>
+					<a th:href="@{/usuario/mi-perfil}"><i class="fa-solid fa-user me-2 text-info"></i> Mi Perfil</a>
+				</th:block>
+
+				<th:block th:if="${session.rol == 'ADMIN'}">
+					<hr class="border-secondary mx-3">
+					<span class="px-4 text-warning small text-uppercase fw-bold">Panel Admin</span>
+					<a th:href="@{/libro/listado}"><i class="fa-solid fa-boxes-stacked me-2 text-warning"></i> Gestión
+						Libros</a>
+					<a th:href="@{/usuario/listado}"><i class="fa-solid fa-users me-2 text-warning"></i> Gestión
+						Usuarios</a>
+					<a th:href="@{/pedido/listado}"><i class="fa-regular fa-file-lines me-2 text-warning"></i> Historial
+						Ventas</a>
+				</th:block>
+
+				<hr class="border-secondary mt-auto">
+				<a th:if="${session.idUsuario != null}" href="#" id="cerrarSesionLink" class="text-danger mb-4"><i
+						class="fa-solid fa-right-from-bracket me-2"></i> Cerrar sesión</a>
+				<a th:if="${session.idUsuario == null}" th:href="@{/login/iniciar-sesion}" class="text-info mb-4"><i
+						class="fa-solid fa-sign-in-alt me-2"></i> Iniciar Sesión</a>
+			</nav>
+			<label for="btn-menu"><i class="fa-solid fa-xmark text-white"></i></label>
+		</div>
+	</div>
+
+	<main class="container-fluid flex-grow-1" style="padding-top: 90px;">
+		<div class="container mt-4 text-white" th:replace="${contenido}">
+			[El contenido de cada vista se renderizará aquí dinámicamente]
+		</div>
+	</main>
+
+	<footer class="bg-dark text-light border-top border-secondary pt-5 pb-4 mt-auto">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4 mb-4">
+					<h5 class="fw-bold text-primary">LibroLink</h5>
+					<p class="text-white-50 small">
+						LibroLink es tu plataforma para descubrir, solicitar y gestionar préstamos de libros.
+						Conectamos historias con personas e incentivamos la lectura en nuestra comunidad.
+					</p>
+					<p class="mb-0 small text-white-50"><i class="fas fa-map-marker-alt me-2 text-primary"></i>Av. Cultura 123, Lima</p>
+					
+					<!-- 🛠️ SOLUCIÓN CRÍTICA: Envolver el correo en un th:text para evadir el parser de expresiones de Thymeleaf -->
+					<p class="mb-0 small text-white-50">
+						<i class="fas fa-envelope me-2 text-primary"></i><span th:text="'contacto@librolink.com'">contacto@librolink.com</span>
+					</p>
+					
+					<p class="small text-white-50"><i class="fas fa-phone me-2 text-primary"></i>+51 123 456 789</p>
+				</div>
+
+				<div class="col-md-2 mb-4">
+					<h6 class="fw-bold text-white">Enlaces</h6>
+					<ul class="list-unstyled small">
+						<li><a th:href="@{/}" class="text-white-50 text-decoration-none">Catálogo</a></li>
+						<li><a th:href="@{/registro}" class="text-white-50 text-decoration-none">Registro</a></li>
+						<li><a th:href="@{/login/iniciar-sesion}" class="text-white-50 text-decoration-none">Iniciar
+								sesión</a></li>
+						<li><a th:href="@{/contacto}"><i class="text-white-50 text-decoration-none">Contacto</i></a></li>
+						<li><a th:href="@{/nosotros}"><i class="text-white-50 text-decoration-none">Nosotros</i></a></li>
+					</ul>
+				</div>
+
+				<div class="col-md-3 mb-4">
+					<h6 class="fw-bold text-white">Síguenos</h6>
+					<div class="d-flex flex-wrap">
+						<a href="#"
+							class="me-2 mb-2 d-inline-block p-1 bg-white rounded shadow-sm opacity-75 hover-opacity-100">
+							<img th:src="@{/img/facebook.png}" alt="Facebook" height="25">
+						</a>
+						<a href="#"
+							class="me-2 mb-2 d-inline-block p-1 bg-white rounded shadow-sm opacity-75 hover-opacity-100">
+							<img th:src="@{/img/instagram.png}" alt="Instagram" height="25">
+						</a>
+						<a href="#"
+							class="me-2 mb-2 d-inline-block p-1 bg-white rounded shadow-sm opacity-75 hover-opacity-100">
+							<img th:src="@{/img/twitter.png}" alt="Twitter" height="25">
+						</a>
+						<a href="#"
+							class="me-2 mb-2 d-inline-block p-1 bg-white rounded shadow-sm opacity-75 hover-opacity-100">
+							<img th:src="@{/img/youtube.png}" alt="YouTube" height="25">
+						</a>
+					</div>
+				</div>
+
+				<div class="col-md-3 mb-4">
+					<h6 class="fw-bold text-white">Métodos de pago</h6>
+					<div class="d-flex flex-wrap align-items-center gap-2">
+						<img th:src="@{/img/visa.png}" alt="Visa" height="30">
+						<img th:src="@{/img/mastercard_1.png}" alt="Mastercard" height="30">
+						<img th:src="@{/img/americanexpress.png}" alt="American Express" height="30">
+						<div class="d-flex align-items-center justify-content-center bg-white rounded p-1"
+							style="height:30px; width:45px;">
+							<img th:src="@{/img/dinersclub_1.png}" alt="Diners Club"
+								style="max-height:100%; max-width:100%;">
+						</div>
+						<img th:src="@{/img/pagoefectivo.jpg}" alt="Pago Efectivo" height="30" class="rounded">
+						<img th:src="@{/img/libro-reclamaciones.png}" alt="Libro de Reclamaciones" height="30">
+					</div>
+				</div>
+			</div>
+
+			<hr class="border-secondary">
+
+			<div class="text-center">
+				<p class="mb-0 small text-white-50">&copy; 2026 LibroLink. Todos los derechos reservados.</p>
+			</div>
+		</div>
+	</footer>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"></script>
+	<script>
+		$("#cerrarSesionLink").on("click", function (e) {
+			e.preventDefault();
+			Swal.fire({
+				title: "¿Deseas cerrar sesión en LibroLink?",
+				text: "Tu sesión actual y el progreso del carrito se guardarán de forma segura.",
+				icon: "question",
+				showCancelButton: true,
+				confirmButtonColor: "#0d6efd",
+				cancelButtonColor: "#dc3545",
+				confirmButtonText: "Sí, salir",
+				cancelButtonText: "Cancelar"
+			}).then((result) => {
+				if (result.isConfirmed) {
+					window.location.href = "/login/cerrar-sesion";
+				}
+			});
+		});
+	</script>
+
+	<th:block th:utext="${alert}"></th:block>
+	<th:block th:utext="${toast}"></th:block>
+</body>
+
+</html>

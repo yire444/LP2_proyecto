@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layoutBase(~{:: #pasarelaContent})}">
+
+<body>
+	<div id="pasarelaContent" class="animate__animated animate__fadeIn pb-5 mt-4">
+
+		<link th:href="@{/estilos/pasarela_pago.css}" rel="stylesheet" />
+
+		<style>
+			.input-premium { transition: all 0.25s ease-in-out; }
+			.tarjeta-visa { border-color: #0d6efd !important; box-shadow: 0 0 8px rgba(13, 110, 253, 0.3) !important; }
+			.tarjeta-master { border-color: #ffc107 !important; box-shadow: 0 0 8px rgba(255, 193, 7, 0.3) !important; }
+			.tarjeta-diners { border-color: #0dcaf0 !important; box-shadow: 0 0 8px rgba(13, 202, 240, 0.3) !important; }
+			.tarjeta-error { border-color: #dc3545 !important; box-shadow: 0 0 8px rgba(220, 53, 69, 0.3) !important; }
+		</style>
+
+		<div class="row justify-content-center">
+			<div class="col-md-6 col-lg-5">
+				<div class="card bg-secondary border-0 p-4 rounded-4 shadow-sm text-white card-premium">
+
+					<h3 class="fw-bold text-primary text-center mb-1">
+						<i class="fa-solid fa-credit-card me-2"></i>Pasarela de Pago
+					</h3>
+					<p class="text-white-50 text-center small mb-4">Ingresa los datos de tu tarjeta de crédito o débito.</p>
+
+					<div class="alert alert-dark border-secondary bg-dark text-center py-2 mb-4 rounded-3">
+						<span class="text-white-50 small text-uppercase d-block">Total a Transferir</span>
+						<h2 class="text-info fw-bold m-0">S/ <span th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span></h2>
+					</div>
+
+					<form id="formPasarela" th:action="@{/pedido/confirmar}" method="post">
+
+						<div class="mb-3">
+							<label class="form-label small text-white-50">Nombre del Titular</label>
+							<input type="text" name="titular" required
+								class="form-control bg-dark text-white border-secondary rounded-3 input-premium"
+								placeholder="EJ. JUAN PEREZ ALVA" autocomplete="off" style="text-transform: uppercase;" />
+						</div>
+
+						<div class="mb-3">
+							<div class="d-flex justify-content-between align-items-center mb-2">
+								<label class="form-label small text-white-50 m-0">Número de Tarjeta</label>
+								<span id="franquiciaLabel" class="badge bg-dark border border-secondary text-white-50 px-2 py-1 small rounded-3">
+									<i class="fa-solid fa-credit-card me-1"></i> Tarjeta
+								</span>
+							</div>
+							<input type="text" id="inputTarjeta" name="nroTarjeta" required maxlength="19"
+								class="form-control bg-dark text-white border-secondary rounded-3 fs-5 input-premium"
+								placeholder="0000 0000 0000 0000" autocomplete="off" />
+						</div>
+
+						<div class="row g-3 mb-4">
+							<div class="col-6">
+								<label class="form-label small text-white-50">Expiración</label>
+								<input type="text" id="inputExpiracion" name="expiracion" maxlength="7" required
+									class="form-control bg-dark text-white border-secondary rounded-3 text-center fw-bold input-premium"
+									placeholder="MM/YYYY" autocomplete="off" />
+							</div>
+							<div class="col-6">
+								<label class="form-label small text-white-50">CVV</label>
+								<input type="password" id="inputCvv" name="cvv" maxlength="3" required
+									class="form-control bg-dark text-white border-secondary rounded-3 text-center input-premium"
+									placeholder="•••" autocomplete="off" />
+							</div>
+						</div>
+
+						<button type="submit" class="btn btn-primary w-100 btn-lg fw-bold shadow-sm mb-3 rounded-3">
+							<i class="fa-solid fa-lock me-2"></i>Pagar de Forma Segura
+						</button>
+
+						<a th:href="@{/carrito}" class="btn btn-outline-light w-100 rounded-3 btn-sm">
+							<i class="fa-solid fa-arrow-left me-2"></i>Regresar al Carrito
+						</a>
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="modalProcesando" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-sm">
+				<div class="modal-content bg-dark border border-secondary rounded-4 p-4 text-center text-white">
+					<div id="statusCargando" class="py-3">
+						<div class="spinner-border text-info mb-3" style="width: 3rem; height: 3rem;" role="status">
+							<span class="visually-hidden">Procesando...</span>
+						</div>
+						<h5 class="fw-bold text-white mb-1">Validando Tarjeta</h5>
+						<p class="text-white-50 small m-0">Conectando de forma segura con el banco...</p>
+					</div>
+					<div id="statusExito" class="py-3 d-none animate__animated animate__scaleIn">
+						<div class="mb-3 text-success">
+							<i class="fa-solid fa-circle-check fa-4x animate__animated animate__bounceIn"></i>
+						</div>
+						<h4 class="fw-bold text-success mb-1">¡Pago Exitoso!</h4>
+						<p class="text-white-50 small m-0">Tu orden ha sido procesada con éxito.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<script th:inline="javascript">
+		document.addEventListener("DOMContentLoaded", () => {
+			const inputTarjeta = document.getElementById("inputTarjeta");
+			const label = document.getElementById("franquiciaLabel");
+			const inputExp = document.getElementById("inputExpiracion");
+			const inputCvv = document.getElementById("inputCvv");
+			const form = document.getElementById("formPasarela");
+			const modal = new bootstrap.Modal(document.getElementById('modalProcesando'));
+
+			// 1. Animación del loader al pagar con validación reforzada
+			form.addEventListener("submit", (e) => {
+				e.preventDefault();
+
+				// Evitamos envíos si la tarjeta no es admitida
+				if (inputTarjeta.classList.contains("tarjeta-error")) {
+					alert("Por favor, ingresa una tarjeta válida.");
+					return;
+				}
+
+				const expVal = inputExp.value;
+				if (expVal.length === 7) {
+					const anioIngresado = parseInt(expVal.substring(3, 7));
+					const anioActual = new Date().getFullYear();
+					if (anioIngresado < anioActual) {
+						alert("La tarjeta ya ha expirado. Verifica el año.");
+						return;
+					}
+				}
+
+				modal.show();
+				setTimeout(() => {
+					document.getElementById("statusCargando").classList.add("d-none");
+					document.getElementById("statusExito").classList.remove("d-none");
+					setTimeout(() => {
+						// 🌟 SOLUCIÓN: Desvinculamos el listener temporalmente para que permita enviar de verdad
+						form.submit();
+					}, 2000);
+				}, 3000);
+			});
+
+			// 2. Máscara de tarjeta
+			inputTarjeta.addEventListener("input", (e) => {
+				let clean = e.target.value.replace(/\D/g, "");
+				inputTarjeta.classList.remove("tarjeta-visa", "tarjeta-master", "tarjeta-diners", "tarjeta-error");
+
+				if (clean.startsWith("4")) {
+					inputTarjeta.classList.add("tarjeta-visa");
+					label.className = "badge bg-primary text-white px-2 py-1 small rounded-3";
+					label.innerHTML = '<i class="fa-brands fa-cc-visa me-1"></i> VISA';
+				} else if (clean.startsWith("5")) {
+					inputTarjeta.classList.add("tarjeta-master");
+					label.className = "badge bg-warning text-dark px-2 py-1 small rounded-3";
+					label.innerHTML = '<i class="fa-brands fa-cc-mastercard me-1"></i> MASTERCARD';
+				} else if (clean.startsWith("3")) {
+					inputTarjeta.classList.add("tarjeta-diners");
+					label.className = "badge bg-info text-dark px-2 py-1 small rounded-3";
+					label.innerHTML = '<i class="fa-brands fa-cc-diners-club me-1"></i> DINERS';
+				} else if (clean.length > 0) {
+					inputTarjeta.classList.add("tarjeta-error");
+					label.className = "badge bg-danger text-white px-2 py-1 small rounded-3";
+					label.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i> NO ADMITIDA';
+				} else {
+					label.className = "badge bg-dark border border-secondary text-white-50 px-2 py-1 small rounded-3";
+					label.innerHTML = '<i class="fa-solid fa-credit-card me-1"></i> Tarjeta';
+				}
+
+				e.target.value = clean.match(/.{1,4}/g)?.join(" ") || "";
+			});
+
+			// Candado estricto en el teclado
+			inputTarjeta.addEventListener("keydown", (e) => {
+				let clean = inputTarjeta.value.replace(/\D/g, "");
+				let maxDigitos = clean.startsWith("3") ? 14 : 16;
+				const teclasPermitidas = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab", "Control"];
+				if (teclasPermitidas.includes(e.key) || e.ctrlKey) return;
+
+				if (!/^\d$/.test(e.key) || clean.length >= maxDigitos) {
+					e.preventDefault();
+				}
+			});
+
+			// 3. Expiración MM/YYYY
+			inputExp.addEventListener("input", (e) => {
+				let clean = e.target.value.replace(/\D/g, "");
+				clean = clean.substring(0, 6);
+
+				if (clean.length === 1 && e.inputType !== "deleteContentBackward") {
+					if (clean !== "0" && clean !== "1") clean = "0" + clean;
+				}
+
+				if (clean.length >= 2) {
+					let mes = clean.substring(0, 2);
+					let anio = clean.substring(2, 6);
+					if (parseInt(mes) > 12) mes = "12";
+					if (parseInt(mes) === 0) mes = "01";
+					e.target.value = anio.length > 0 ? mes + "/" + anio : mes + "/";
+				} else {
+					e.target.value = clean;
+				}
+			});
+
+			inputExp.addEventListener("keydown", (e) => {
+				let clean = inputExp.value.replace(/\D/g, "");
+				const teclasPermitidas = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"];
+				if (teclasPermitidas.includes(e.key)) return;
+
+				if (!/^\d$/.test(e.key) || clean.length >= 6) {
+					e.preventDefault();
+				}
+			});
+
+			// 4. CVV Límite
+			inputCvv.addEventListener("input", (e) => {
+				e.target.value = e.target.value.replace(/\D/g, "");
+			});
+
+			inputCvv.addEventListener("keydown", (e) => {
+				const teclasPermitidas = ["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"];
+				if (teclasPermitidas.includes(e.key)) return;
+
+				if (!/^\d$/.test(e.key) || inputCvv.value.length >= 3) {
+					e.preventDefault();
+				}
+			});
+		});
+	</script>
+</body>
+</html>
