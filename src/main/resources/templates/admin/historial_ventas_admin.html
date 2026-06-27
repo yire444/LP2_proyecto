@@ -22,7 +22,7 @@
 							<th>Fecha de Compra</th>
 							<th class="text-center">Total Recaudado</th>
 							<th class="text-center">Estado</th>
-							<th class="text-center" style="width: 12%;">Acciones</th>
+							<th class="text-center" style="width: 22%;">Acciones</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -40,6 +40,13 @@
 								<button type="button" class="btn btn-sm btn-outline-info rounded-3 px-3 btn-ver-detalle" 
 										th:data-id="${p.idPedido}">
 									<i class="fa-solid fa-eye me-1"></i>Detalle
+								</button>
+
+								<button type="button" class="btn btn-sm btn-outline-danger rounded-3 px-3 ms-1 btn-anular-pedido"
+										th:data-id="${p.idPedido}"
+										th:data-cliente="${p.usuario.nombre + ' ' + p.usuario.apellido}"
+										th:disabled="${p.estado == 'ANULADO'}">
+									<i class="fa-solid fa-ban me-1"></i>Anular
 								</button>
 							</td>
 						</tr>
@@ -66,12 +73,35 @@
 									</tr>
 								</thead>
 								<tbody id="tbodyDetalleVenta">
-									</tbody>
+								</tbody>
 							</table>
 						</div>
 					</div>
 					<div class="modal-footer border-secondary justify-content-center">
 						<button type="button" class="btn btn-outline-secondary btn-sm px-4 rounded-3" data-bs-dismiss="modal">Cerrar Historial</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="modalConfirmarAnulacion" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content bg-dark text-white border-secondary rounded-4 shadow-lg">
+					<div class="modal-header border-0 justify-content-center pt-4">
+						<div class="text-center">
+							<i class="fa-solid fa-triangle-exclamation fa-3x text-danger mb-2"></i>
+							<h5 class="modal-title fw-bold" id="anulacionTitulo">¿Anular esta Transacción?</h5>
+						</div>
+					</div>
+					<div class="modal-body text-center text-white-50 px-4 pb-4">
+						<p id="anulacionMensaje" class="m-0">¿Estás seguro de que deseas proceder?</p>
+					</div>
+					<div class="modal-footer border-0 justify-content-center pb-4">
+						<form th:action="@{/pedido/anular}" method="POST" id="formAnularPedido">
+							<input type="hidden" name="idPedido" id="inputModalIdPedido" />
+							<button type="button" class="btn btn-outline-secondary px-4 rounded-3 me-2" data-bs-dismiss="modal">Cancelar</button>
+							<button type="submit" class="btn btn-danger px-4 rounded-3 fw-bold text-white">Anular Orden</button>
+						</form>
 					</div>
 				</div>
 			</div>
@@ -84,13 +114,13 @@
 					language: {
 						url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/es-ES.json'
 					},
-					searching: true, // El admin puede buscar ventas por nombre de cliente o número
+					searching: true, 
 					lengthChange: false,
-					pageLength: 10,  // Paginación de 10 en 10
-					ordering: false  // Desactiva las flechas de ordenación
+					pageLength: 10,  
+					ordering: false  
 				});
 
-				// 2. Escucha AJAX para pintar el Modal de detalles usando tu /pedido/detalle-json
+				// 2. Escucha AJAX para el Modal de detalles
 				$('.btn-ver-detalle').on('click', function() {
 					var idPedido = $(this).data('id');
 					$('#modalTituloPedido').text('Detalle del Pedido #' + idPedido);
@@ -124,6 +154,23 @@
 							$tbody.html('<tr><td colspan="3" class="text-center py-2 text-danger">Error al recuperar los datos del servidor.</td></tr>');
 						}
 					});
+				});
+
+				// 3. 🌟 Interceptor para armar el modal dinámico de Anulación
+				$('.btn-anular-pedido').on('click', function() {
+					var idPedido = $(this).data('id');
+					var cliente = $(this).data('cliente');
+
+					// Inyectamos el idPedido al input hidden
+					$('#inputModalIdPedido').val(idPedido);
+
+					// Personalizamos los textos del modal de confirmación
+					$('#anulacionTitulo').text('Anular Pedido #' + idPedido);
+					$('#anulacionMensaje').html('¿Estás completamente seguro de que deseas anular la venta de <strong>' + cliente + '</strong>?<br><span class="text-danger small">Esta acción devolverá los libros al stock y revocará la transacción.</span>');
+
+					// Mostramos el modal
+					var modalAnular = new bootstrap.Modal(document.getElementById('modalConfirmarAnulacion'));
+					modalAnular.show();
 				});
 			});
 		</script>

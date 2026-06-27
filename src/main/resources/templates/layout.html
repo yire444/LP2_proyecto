@@ -64,12 +64,18 @@
 				<th:block th:if="${session.rol == 'ADMIN'}">
 					<hr class="border-secondary mx-3">
 					<span class="px-4 text-warning small text-uppercase fw-bold">Panel Admin</span>
-					<a th:href="@{/libro/listado}"><i class="fa-solid fa-boxes-stacked me-2 text-warning"></i> Gestión
-						Libros</a>
-					<a th:href="@{/usuario/listado}"><i class="fa-solid fa-users me-2 text-warning"></i> Gestión
-						Usuarios</a>
-					<a th:href="@{/pedido/listado}"><i class="fa-regular fa-file-lines me-2 text-warning"></i> Historial
-						Ventas</a>
+					<a th:href="@{/libro/listado}">
+						<i class="fa-solid fa-boxes-stacked me-2 text-warning"></i> Gestión Libros
+					</a>
+					<a th:href="@{/usuario/listado}">
+						<i class="fa-solid fa-users me-2 text-warning"></i> Gestión Usuarios
+					</a>
+					<a th:href="@{/categoria/listado}">
+						<i class="fa-solid fa-tags me-2 text-warning"></i> Gestión Categorías
+					</a>
+					<a th:href="@{/pedido/listado}">
+						<i class="fa-regular fa-file-lines me-2 text-warning"></i> Historial Ventas
+					</a>
 				</th:block>
 
 				<hr class="border-secondary mt-auto">

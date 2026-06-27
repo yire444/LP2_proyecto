@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layoutBase(~{:: #categoriasAdminContent})}">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+	<div id="categoriasAdminContent" class="animate__animated animate__fadeIn pb-5">
+
+		<section class="d-flex justify-content-between align-items-center my-4">
+			<div>
+				<h2 class="fw-bold text-warning mb-1"><i class="fa-solid fa-tags me-2"></i>Gestión de Categorías</h2>
+				<p class="text-white-50 m-0">Administra las clasificaciones de los libros disponibles en la plataforma.</p>
+			</div>
+			<button type="button" class="btn btn-primary rounded-3 fw-bold shadow-sm btn-nueva-categoria">
+				<i class="fa-solid fa-plus me-2"></i>Nueva Categoría
+			</button>
+		</section>
+
+		<div class="card bg-secondary border-0 p-4 rounded-4 shadow-sm text-white"
+			style="background: rgba(33, 37, 41, 0.85) !important; backdrop-filter: blur(10px);">
+			<div class="table-responsive">
+				<table id="tablaCategoriasAdmin" class="table table-dark table-hover align-middle m-0 border-secondary">
+					<thead>
+						<tr class="text-warning border-secondary small text-uppercase">
+							<th style="width: 10%;">ID</th>
+							<th style="width: 25%;">Nombre Categoria</th>
+							<th>Descripción</th>
+							<th class="text-center" style="width: 15%;">Estado</th>
+							<th class="text-center" style="width: 22%;">Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="c : ${lstCategoriasAdmin}" class="border-secondary">
+							<td class="fw-bold text-white-50" th:text="'#' + ${c.idCategoria}">#1</td>
+							<td class="fw-bold text-white" th:text="${c.nombre}">Categoría</td>
+							<td class="text-white-50" th:text="${c.descripcion != null ? c.descripcion : 'Sin descripción.'}">Descripción</td>
+							
+							<td class="text-center">
+								<span th:text="${c.activo == true} ? 'Activo' : 'Inactivo'"
+									th:classappend="${c.activo == true} ? 'bg-success' : 'bg-danger'"
+									class="badge rounded-pill px-3 py-1">Estado</span>
+							</td>
+
+							<td class="text-center">
+								<button type="button" class="btn btn-sm btn-outline-warning rounded-3 px-3 shadow-sm btn-editar-categoria"
+								   th:data-id="${c.idCategoria}"
+								   th:data-nombre="${c.nombre}"
+								   th:data-descripcion="${c.descripcion}">
+									<i class="fa-solid fa-pen-to-square me-1"></i> Editar
+								</button>
+								
+								<button type="button" class="btn btn-sm rounded-3 px-3 ms-1 shadow-sm btn-eliminar-categoria"
+										th:data-id="${c.idCategoria}"
+										th:data-nombre="${c.nombre}"
+										th:data-activo="${c.activo == true}"
+										th:classappend="${c.activo == true} ? 'btn-outline-danger' : 'btn-outline-success'">
+									<i class="fa-solid" th:classappend="${c.activo == true} ? 'fa-trash-can me-1' : 'fa-trash-arrow-up me-1'"></i>
+									<span th:text="${c.activo == true} ? 'Eliminar' : 'Activar'">Acción</span>
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="modal fade" id="modalFormCategoria" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content bg-dark text-white border-secondary rounded-4 shadow-lg">
+					<div class="modal-header border-secondary">
+						<h5 class="modal-title fw-bold text-warning" id="modalCategoriaTitulo">Nueva Categoría</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<form th:action="@{/categoria/guardar}" method="POST" th:object="${categoriaObj}">
+						<div class="modal-body px-4 py-3">
+							<input type="hidden" th:field="*{idCategoria}" id="inputModalIdCat" />
+
+							<div class="mb-3">
+								<label for="inputModalNombre" class="form-label text-white-50 small fw-bold">Nombre de la Categoría</label>
+								<input type="text" th:field="*{nombre}" id="inputModalNombre" class="form-control bg-secondary border-0 text-white" placeholder="Ej. Literatura Contemporánea" required maxlength="100">
+							</div>
+							
+							<div class="mb-2">
+								<label for="inputModalDesc" class="form-label text-white-50 small fw-bold">Descripción (Opcional)</label>
+								<textarea th:field="*{descripcion}" id="inputModalDesc" class="form-control bg-secondary border-0 text-white" rows="3" placeholder="Añade un breve resumen del enfoque de esta categoría..." maxlength="255"></textarea>
+							</div>
+						</div>
+						<div class="modal-footer border-0 justify-content-end pb-4 pe-4">
+							<button type="button" class="btn btn-outline-secondary px-4 rounded-3 me-2" data-bs-dismiss="modal">Cancelar</button>
+							<button type="submit" id="btnModalGuardarCat" class="btn btn-primary px-4 rounded-3 fw-bold shadow-sm">Registrar</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal fade" id="modalEliminarCategoria" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content bg-dark text-white border-secondary rounded-4 shadow-lg">
+					<div class="modal-header border-0 justify-content-center pt-4">
+						<div class="text-center">
+							<i id="modalIconoCat" class="fa-solid fa-trash-can fa-3x mb-2"></i>
+							<h5 class="modal-title fw-bold" id="eliminarCatTitulo">Modificar Estado</h5>
+						</div>
+					</div>
+					<div class="modal-body text-center text-white-50 px-4 pb-4">
+						<p id="eliminarCatMensaje" class="m-0">¿Estás seguro?</p>
+					</div>
+					<div class="modal-footer border-0 justify-content-center pb-4">
+						<form th:action="@{/categoria/eliminar}" method="POST" id="formEliminarCategoria">
+							<input type="hidden" name="idCategoria" id="inputModalIdEliminar" />
+							<button type="button" class="btn btn-outline-secondary px-4 rounded-3 me-2" data-bs-dismiss="modal">Cancelar</button>
+							<button type="submit" id="btnModalConfirmarCat" class="btn px-4 rounded-3 fw-bold text-white">Confirmar</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script th:inline="none">
+			$(document).ready(function () {
+				// Initialize DataTables
+				$('#tablaCategoriasAdmin').DataTable({
+					language: {
+						url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/es-ES.json'
+					},
+					searching: true, 
+					lengthChange: false,
+					pageLength: 10,   
+					ordering: false   
+				});
+
+				// Evento para abrir modal en modo: NUEVA CATEGORÍA
+				$('.btn-nueva-categoria').on('click', function() {
+					$('#inputModalIdCat').val('');
+					$('#inputModalNombre').val('');
+					$('#inputModalDesc').val('');
+					
+					$('#modalCategoriaTitulo').text('Nueva Categoría');
+					$('#btnModalGuardarCat').attr('class', 'btn btn-primary px-4 rounded-3 fw-bold shadow-sm').text('Registrar Categoria');
+					
+					var modalForm = new bootstrap.Modal(document.getElementById('modalFormCategoria'));
+					modalForm.show();
+				});
+
+				// Evento para abrir modal en modo: EDITAR CATEGORÍA
+				$('.btn-editar-categoria').on('click', function() {
+					var idCat = $(this).data('id');
+					var nombre = $(this).data('nombre');
+					var desc = $(this).data('descripcion');
+
+					$('#inputModalIdCat').val(idCat);
+					$('#inputModalNombre').val(nombre);
+					$('#inputModalDesc').val(desc);
+					
+					$('#modalCategoriaTitulo').text('Editar Categoría #' + idCat);
+					$('#btnModalGuardarCat').attr('class', 'btn btn-warning px-4 rounded-3 fw-bold text-dark shadow-sm').text('Guardar Cambios');
+					
+					var modalForm = new bootstrap.Modal(document.getElementById('modalFormCategoria'));
+					modalForm.show();
+				});
+
+				// Interceptor dinámico para el Modal de Eliminación / Activación
+				$('.btn-eliminar-categoria').on('click', function() {
+					var idCat = $(this).data('id');
+					var nombre = $(this).data('nombre');
+					var estaActiva = $(this).data('activo');
+
+					$('#inputModalIdEliminar').val(idCat);
+
+					if (estaActiva) {
+						$('#modalIconoCat').attr('class', 'fa-solid fa-trash-can fa-3x text-danger mb-2');
+						$('#eliminarCatTitulo').text('Desactivar Categoría #' + idCat);
+						$('#eliminarCatMensaje').html('¿Estás seguro de dar de baja la categoría <strong>' + nombre + '</strong>?<br><span class="text-danger small">Los libros vinculados a esta categoría podrían ocultarse o requerir reasignación.</span>');
+						$('#btnModalConfirmarCat').attr('class', 'btn btn-danger px-4 rounded-3 fw-bold text-white').text('Confirmar Baja');
+					} else {
+						$('#modalIconoCat').attr('class', 'fa-solid fa-trash-arrow-up fa-3x text-success mb-2');
+						$('#eliminarCatTitulo').text('Activar Categoría #' + idCat);
+						$('#eliminarCatMensaje').html('¿Deseas restaurar la categoría <strong>' + nombre + '</strong>?<br>Volverá a estar habilitada para organizar el inventario.');
+						$('#btnModalConfirmarCat').attr('class', 'btn btn-success px-4 rounded-3 fw-bold text-white').text('Confirmar Alta');
+					}
+
+					var modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminarCategoria'));
+					modalEliminar.show();
+				});
+			});
+		</script>
+
+	</div>
+</body>
+</html>

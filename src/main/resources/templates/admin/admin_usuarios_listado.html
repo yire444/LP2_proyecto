@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layoutBase(~{:: #usuariosAdminContent})}">
+
 <head>
-    <meta charset="UTF-8">
+	<meta charset="UTF-8">
 </head>
+
 <body>
 	<div id="usuariosAdminContent" class="animate__animated animate__fadeIn pb-5">
 
 		<section class="text-center my-4">
 			<h2 class="fw-bold text-warning mb-2"><i class="fa-solid fa-users me-2"></i>Gestión de Usuarios</h2>
-			<p class="text-white-50 lead">Monitorea, revisa y supervisa las cuentas de los clientes registrados en LibroLink.</p>
+			<p class="text-white-50 lead">Monitorea, revisa y supervisa las cuentas de los clientes registrados en
+				LibroLink.</p>
 		</section>
 
 		<div class="card bg-secondary border-0 p-4 rounded-4 shadow-sm text-white"
@@ -24,6 +27,7 @@
 							<th>Teléfono</th>
 							<th>F. Nacimiento</th>
 							<th class="text-center">Estado</th>
+							<th class="text-center" style="width: 15%;">Acciones</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -39,9 +43,45 @@
 									th:classappend="${u.activo == 1 || u.activo == true} ? 'bg-success' : 'bg-danger'"
 									class="badge rounded-pill px-3 py-1">Estado</span>
 							</td>
+							<td class="text-center">
+								<button type="button" class="btn btn-sm rounded-3 px-3 fw-bold btn-cambiar-estado"
+									th:data-id="${u.idUsuario}" th:data-nombre="${u.nombre + ' ' + u.apellido}"
+									th:data-activo="${u.activo == 1 || u.activo == true}"
+									th:classappend="${u.activo == 1 || u.activo == true} ? 'btn-outline-danger' : 'btn-outline-success'">
+									<i class="fa-solid"
+										th:classappend="${u.activo == 1 || u.activo == true} ? 'fa-user-slash me-1' : 'fa-user-check me-1'"></i>
+									<span
+										th:text="${u.activo == 1 || u.activo == true} ? 'Desactivar' : 'Activar'">Acción</span>
+								</button>
+							</td>
 						</tr>
 					</tbody>
 				</table>
+			</div>
+		</div>
+
+		<div class="modal fade" id="modalConfirmarEstado" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content bg-dark text-white border-secondary rounded-4 shadow-lg">
+					<div class="modal-header border-0 justify-content-center pt-4">
+						<div class="text-center">
+							<i id="modalIcono" class="fa-solid fa-circle-exclamation fa-3x mb-2"></i>
+							<h5 class="modal-title fw-bold" id="modalTitulo">¿Confirmar Acción?</h5>
+						</div>
+					</div>
+					<div class="modal-body text-center text-white-50 px-4 pb-4">
+						<p id="modalMensaje" class="m-0">¿Estás seguro de realizar esta acción sobre el usuario?</p>
+					</div>
+					<div class="modal-footer border-0 justify-content-center pb-4">
+						<form th:action="@{/usuario/eliminar}" method="POST" id="formCambiarEstado">
+							<input type="hidden" name="idUsuario" id="inputModalIdUsuario" />
+							<button type="button" class="btn btn-outline-secondary px-4 rounded-3 me-2"
+								data-bs-dismiss="modal">Cancelar</button>
+							<button type="submit" id="btnModalConfirmar"
+								class="btn px-4 rounded-3 fw-bold text-white">Confirmar</button>
+						</form>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -51,14 +91,38 @@
 					language: {
 						url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/es-ES.json'
 					},
-					searching: true, // El admin puede buscar por Nombre, Apellido, DNI o Correo
+					searching: true,
 					lengthChange: false,
-					pageLength: 10,  // Paginación de 10 en 10
-					ordering: false  // Desactiva las flechas de subida y bajada de las cabeceras
+					pageLength: 10,
+					ordering: false
+				});
+
+				$('.btn-cambiar-estado').on('click', function () {
+					var id = $(this).data('id');
+					var nombre = $(this).data('nombre');
+					var estaActivo = $(this).data('activo');
+
+					$('#inputModalIdUsuario').val(id);
+
+					if (estaActivo) {
+						$('#modalIcono').attr('class', 'fa-solid fa-user-slash fa-3x text-danger mb-2');
+						$('#modalTitulo').text('Desactivar Usuario');
+						$('#modalMensaje').html('¿Estás seguro de que deseas dar de baja a <strong>' + nombre + '</strong>?<br>No podrá iniciar sesión hasta ser reactivado.');
+						$('#btnModalConfirmar').attr('class', 'btn btn-danger px-4 rounded-3 fw-bold text-white');
+					} else {
+						$('#modalIcono').attr('class', 'fa-solid fa-user-check fa-3x text-success mb-2');
+						$('#modalTitulo').text('Activar Usuario');
+						$('#modalMensaje').html('¿Deseas restaurar la cuenta de <strong>' + nombre + '</strong>?<br>Volverá a tener acceso total al sistema.');
+						$('#btnModalConfirmar').attr('class', 'btn btn-success px-4 rounded-3 fw-bold text-white');
+					}
+
+					var miModal = new bootstrap.Modal(document.getElementById('modalConfirmarEstado'));
+					miModal.show();
 				});
 			});
 		</script>
 
 	</div>
 </body>
+
 </html>

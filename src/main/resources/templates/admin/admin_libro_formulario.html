@@ -46,7 +46,21 @@
 										th:text="${cat.nombre}"></option>
 							</select>
 						</div>
+						
+						<div class="col-12">
+						    <label class="form-label text-warning small text-uppercase fw-bold">Descripción / Sinopsis</label>
+						    <textarea th:field="*{descripcion}" class="form-control bg-dark border-secondary text-white rounded-3" 
+						              rows="3" placeholder="Escribe un breve resumen de la obra..." required></textarea>
+						    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></div>
+						</div>
 
+						<div class="col-12">
+						    <label class="form-label text-warning small text-uppercase fw-bold">URL o Archivo de la Imagen</label>
+						    <input type="text" th:field="*{imagen}" class="form-control bg-dark border-secondary text-white rounded-3" 
+						           placeholder="Ej. libro50.jpg o https://enlace.com/imagen.jpg" required>
+						    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('imagen')}" th:errors="*{imagen}"></div>
+						</div>
+								
 						<div class="col-md-6">
 							<label class="form-label text-warning small text-uppercase fw-bold">Precio de Venta (S/)</label>
 							<div class="input-group">

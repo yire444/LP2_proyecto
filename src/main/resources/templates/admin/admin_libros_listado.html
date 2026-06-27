@@ -28,7 +28,8 @@
 							<th>Categoría</th>
 							<th class="text-center">Precio</th>
 							<th class="text-center">Stock</th>
-							<th class="text-center" style="width: 12%;">Acciones</th>
+							<th class="text-center">Estado</th>
+							<th class="text-center" style="width: 22%;">Acciones</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -44,11 +45,27 @@
 							<td class="text-center fw-bold" 
 								th:classappend="${l.stock > 5} ? 'text-white' : 'text-danger'" 
 								th:text="${l.stock}">0</td>
+							
+							<td class="text-center">
+								<span th:text="${l.activo == true} ? 'Activo' : 'Inactivo'"
+									th:classappend="${l.activo == true} ? 'bg-success' : 'bg-danger'"
+									class="badge rounded-pill px-3 py-1">Estado</span>
+							</td>
+
 							<td class="text-center">
 								<a th:href="@{/libro/editar(idLibro=${l.idLibro})}" 
-								   class="btn btn-sm btn-outline-warning rounded-3 px-3">
+								   class="btn btn-sm btn-outline-warning rounded-3 px-3 shadow-sm">
 									<i class="fa-solid fa-pen-to-square me-1"></i> Editar
 								</a>
+								
+								<button type="button" class="btn btn-sm rounded-3 px-3 ms-1 shadow-sm btn-eliminar-libro"
+										th:data-id="${l.idLibro}"
+										th:data-titulo="${l.titulo}"
+										th:data-activo="${l.activo == true}"
+										th:classappend="${l.activo == true} ? 'btn-outline-danger' : 'btn-outline-success'">
+									<i class="fa-solid" th:classappend="${l.activo == true} ? 'fa-trash-can me-1' : 'fa-trash-arrow-up me-1'"></i>
+									<span th:text="${l.activo == true} ? 'Eliminar' : 'Activar'">Acción</span>
+								</button>
 							</td>
 						</tr>
 					</tbody>
@@ -56,16 +73,64 @@
 			</div>
 		</div>
 
+		<div class="modal fade" id="modalEliminarLibro" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content bg-dark text-white border-secondary rounded-4 shadow-lg">
+					<div class="modal-header border-0 justify-content-center pt-4">
+						<div class="text-center">
+							<i id="modalIconoLibro" class="fa-solid fa-trash-arrow-up fa-3x mb-2"></i>
+							<h5 class="modal-title fw-bold" id="eliminarLibroTitulo">¿Retirar Libro del Catálogo?</h5>
+						</div>
+					</div>
+					<div class="modal-body text-center text-white-50 px-4 pb-4">
+						<p id="eliminarLibroMensaje" class="m-0">¿Estás seguro de realizar esta acción?</p>
+					</div>
+					<div class="modal-footer border-0 justify-content-center pb-4">
+						<form th:action="@{/libro/eliminar}" method="POST" id="formEliminarLibro">
+							<input type="hidden" name="idLibro" id="inputModalIdLibro" />
+							<button type="button" class="btn btn-outline-secondary px-4 rounded-3 me-2" data-bs-dismiss="modal">Cancelar</button>
+							<button type="submit" id="btnModalConfirmarLibro" class="btn px-4 rounded-3 fw-bold text-white">Confirmar</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<script th:inline="none">
 			$(document).ready(function () {
+				// Initialize DataTable
 				$('#tablaLibrosAdmin').DataTable({
 					language: {
 						url: 'https://cdn.datatables.net/plug-ins/2.3.2/i18n/es-ES.json'
 					},
-					searching: true, // Permitimos buscar obras rápidamente
+					searching: true, 
 					lengthChange: false,
-					pageLength: 10,   // Paginación de 10 en 10
-					ordering: false   // Sin flechas molestas de subida o bajada
+					pageLength: 10,   
+					ordering: false   
+				});
+
+				// Interceptor dinámico para armar el modal según el estado
+				$('.btn-eliminar-libro').on('click', function() {
+					var idLibro = $(this).data('id');
+					var titulo = $(this).data('titulo');
+					var estaActivo = $(this).data('activo'); // Captura true o false
+
+					$('#inputModalIdLibro').val(idLibro);
+
+					if (estaActivo) {
+						$('#modalIconoLibro').attr('class', 'fa-solid fa-trash-can fa-3x text-danger mb-2');
+						$('#eliminarLibroTitulo').text('Desactivar Obra #' + idLibro);
+						$('#eliminarLibroMensaje').html('¿Estás seguro de que deseas dar de baja la obra <strong>' + titulo + '</strong>?<br><span class="text-danger small">Se ocultará inmediatamente de la vitrina pública de los clientes.</span>');
+						$('#btnModalConfirmarLibro').attr('class', 'btn btn-danger px-4 rounded-3 fw-bold text-white').text('Eliminar de la Tienda');
+					} else {
+						$('#modalIconoLibro').attr('class', 'fa-solid fa-trash-arrow-up fa-3x text-success mb-2');
+						$('#eliminarLibroTitulo').text('Activar Obra #' + idLibro);
+						$('#eliminarLibroMensaje').html('¿Deseas restaurar la obra <strong>' + titulo + '</strong>?<br>Volverá a estar visible y disponible para compra en el catálogo público.');
+						$('#btnModalConfirmarLibro').attr('class', 'btn btn-success px-4 rounded-3 fw-bold text-white').text('Activar en la Tienda');
+					}
+
+					var modalEliminar = new bootstrap.Modal(document.getElementById('modalEliminarLibro'));
+					modalEliminar.show();
 				});
 			});
 		</script>

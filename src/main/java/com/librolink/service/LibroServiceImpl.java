@@ -24,6 +24,11 @@ public class LibroServiceImpl implements ILibroService {
 		return libroRepo.findAllByOrderByIdLibroDesc();
 	}
 	
+	@Override
+	public List<Libro> listarLibrosActivos() {
+		return libroRepo.findByActivoTrueOrderByIdLibroDesc();
+	}
+	
 	// BUSCAR LIBRO POR LOS FILTROS DEL REPO
 	@Override
 	public List<Libro> buscarLibrosPorFiltros(LibroFilter filter) {
@@ -87,8 +92,8 @@ public class LibroServiceImpl implements ILibroService {
 			libroBD.setStock(libroData.getStock());
 			libroBD.setCategoria(libroData.getCategoria());
 			
-			if (libroData.getImagen() == null || libroData.getImagen().trim().isEmpty()) {
-				return ResultadoResponse.error("El campo de la imagen es obligatorio para actualizar el libro.");
+			if (libroData.getImagen() != null && !libroData.getImagen().trim().isEmpty()) {
+			    libroBD.setImagen(libroData.getImagen().trim());
 			}
 			libroBD.setImagen(libroData.getImagen().trim());
 

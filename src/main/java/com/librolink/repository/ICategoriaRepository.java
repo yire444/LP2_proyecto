@@ -8,6 +8,7 @@ import com.librolink.model.Categoria;
 @Repository
 public interface ICategoriaRepository extends JpaRepository<Categoria, Integer> {
 	
+	List<Categoria> findByNombreContainingIgnoreCase(String nombre);
 	// LISTAR CATEGORÍAS ALFABÉTICAMENTE POR NOMBRE (A - Z)
 	List<Categoria> findAllByOrderByDescripcionAsc();
 	

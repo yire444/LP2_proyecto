@@ -16,7 +16,6 @@ import com.librolink.dto.LibroFilter;
 import com.librolink.dto.ResultadoResponse;
 import com.librolink.model.Libro;
 import com.librolink.repository.ICategoriaRepository;
-import com.librolink.repository.ILibroRepository;
 import com.librolink.service.ILibroService;
 import com.librolink.service.IUsuarioService;
 import com.librolink.util.Alert;
@@ -31,23 +30,27 @@ public class HomeController {
 
 	private final IUsuarioService usuarioService;
 	private final ILibroService libroService;
-	private final ILibroRepository libroRepo;
 	private final ICategoriaRepository categoriaRepo;
 
-	// INDEX HTML (CATÁLOGO GENERAL)
+	// ==========================================
+	// 🏠 RUTA PRINCIPAL: CATÁLOGO DE LA TIENDA (CLIENTE)
+	// ==========================================
 	@GetMapping("/")
 	public String index(@RequestParam(name = "autor", required = false) String autor,
 			@RequestParam(name = "idCategoria", required = false) Integer idCategoria,
 			@RequestParam(name = "ordenPrecio", required = false) String ordenPrecio, Model model) {
 
+		// 1. Armamos el DTO de filtros con lo que viene del HTML
 		LibroFilter filtro = new LibroFilter();
 		filtro.setTitulo(autor);
 		filtro.setAutor(autor);
 		filtro.setIdCategoria(idCategoria);
 		filtro.setOrdenPrecio(ordenPrecio);
 
+		// 2. 🌟 LLAMAMOS AL SERVICIO: Recuerda que tu LibroServiceImpl ya sabe si mandar activos o filtrar
 		List<Libro> listaFiltrada = libroService.buscarLibrosPorFiltros(filtro);
 
+		// 3. Enviamos los datos ordenados a la vista pública
 		model.addAttribute("lstLibros", listaFiltrada);
 		model.addAttribute("categorias", categoriaRepo.findAll());
 
@@ -97,7 +100,8 @@ public class HomeController {
 	public String verDetalle(@RequestParam("idLibro") Integer idLibro, Model model) {
 		Libro libro = libroService.buscarLibroPorId(idLibro);
 
-		List<Libro> similares = libroRepo.findAll().stream()
+		// Filtramos usando 'listarLibrosActivos()' para evitar sugerir libros borrados de la tienda
+		List<Libro> similares = libroService.listarLibrosActivos().stream()
 				.filter(l -> l.getCategoria().getIdCategoria().equals(libro.getCategoria().getIdCategoria())
 						&& !l.getIdLibro().equals(idLibro))
 				.limit(4).toList();
